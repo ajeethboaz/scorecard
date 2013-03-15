@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark"  
+		xmlns:spicefactory="http://www.spicefactory.org/parsley" xmlns:views="views.*" >
+	<fx:Declarations>
+		<spicefactory:Configure/>
+	</fx:Declarations>
+	<s:navigationContent>
+		<s:Button label="Home" click="hme_clickHandler(event)"/>
+	</s:navigationContent>
+	<s:titleContent>
+		<views:AlertClass id="alertClass"/>
+		<s:Label text="Runs:{SBmodel.runsCount}/{SBmodel.wicketsCount} Overs:{SBmodel.ballsCount.toFixed(1)}" color="#ffffff"/>
+	</s:titleContent>
+	<s:actionContent>
+		<s:Button label="Back" click="back_clickHandler(event)"/>
+	</s:actionContent>
+
+	<fx:Script>
+		<![CDATA[
+			import Model.ScoreBoardModel;
+			
+			import mx.collections.ArrayCollection;
+			
+			import spark.events.IndexChangeEvent;
+			
+			[Inject][Bindable] public var SBmodel:ScoreBoardModel;
+			
+			protected function hme_clickHandler(event:MouseEvent):void
+			{
+				SBmodel.teamA_AC.refresh();
+				navigator.popToFirstView();
+				SBmodel.playerListState = 'closed';
+			}
+			protected function back_clickHandler(event:MouseEvent):void
+			{
+				//navigator.pushView(views.BattingSelection);
+				navigator.popToFirstView();
+				SBmodel.playerListState = 'closed';
+			}
+			protected function Balls_clickHandler(event:MouseEvent):void
+			{
+				switch(event.currentTarget.id)
+				{
+					case "minusOneBall":
+						SBmodel.ballsCount = SBmodel.ballsCount-.1;
+						SBmodel.ballsCountAC.removeItemAt(SBmodel.ballsCountAC.length-1);
+						SBmodel.runsCountAC.removeItemAt(SBmodel.runsCountAC.length-1);
+						break;
+					case "plusOneBall":
+						SBmodel.ballsCount = SBmodel.ballsCount+.1;
+						var item:Object = new Object();
+						item.count = 1;
+						SBmodel.ballsCountAC.addItem(item);	
+						break;
+					case "noBall":
+						var item1:Object = new Object();
+						item1.count = "NB";
+						SBmodel.ballsCountAC.addItem(item1);
+						SBmodel.runsCount = SBmodel.runsCount+1;
+						SBmodel.runsCountAC.addItem(item1);	
+						SBmodel.extrasCount++;
+						break;
+					case "minusRunsButton":
+						SBmodel.runsCount = SBmodel.runsCount-1;
+						break;
+					
+				}
+				var j:int = 0;
+				for(var i:int=0; i<SBmodel.ballsCountAC.length; i++)
+				{
+					
+					if(SBmodel.ballsCountAC[i].count == "1") 
+					{
+						j++;
+					}				
+				}
+				if(j >=6)
+				{
+					SBmodel.ballsCount = 1;
+				}
+			}
+			
+			protected function runsButton_clickHandler(event:MouseEvent):void
+			{			
+				switch(event.currentTarget.id)
+				{
+					case "zeroRunsButton":
+						var item:Object = new Object();
+						item.count = 0;
+						SBmodel.runsCountAC.addItem(item);					
+						break;
+					case "oneRunsButton":
+						SBmodel.runsCount = SBmodel.runsCount+1;
+						var item1:Object = new Object();
+						item1.count = 1;
+						SBmodel.runsCountAC.addItem(item1);	
+						break;
+					case "twoRunsButton":
+						SBmodel.runsCount = SBmodel.runsCount+2;
+						var item2:Object = new Object();
+						item2.count = 2;
+						SBmodel.runsCountAC.addItem(item2);					
+						break;
+					case "threeRunsButton":
+						SBmodel.runsCount = SBmodel.runsCount+3;
+						var item3:Object = new Object();
+						item3.count = 3;
+						SBmodel.runsCountAC.addItem(item3);
+						break;
+					case "fourRunsButton":
+						SBmodel.runsCount = SBmodel.runsCount+4;
+						var item4:Object = new Object();
+						item4.count = 4;
+						SBmodel.runsCountAC.addItem(item4);					
+						break;
+					case "fiveRunsButton":
+						SBmodel.runsCount = SBmodel.runsCount+5;
+						var item5:Object = new Object();
+						item5.count = 5;
+						SBmodel.runsCountAC.addItem(item5);					
+						break;
+					case "sixRunsButton":
+						SBmodel.runsCount = SBmodel.runsCount+6;
+						var item6:Object = new Object();
+						item6.count = 6;
+						SBmodel.runsCountAC.addItem(item6);					
+						break;
+					case "sevenRunsButton":
+						SBmodel.runsCount = SBmodel.runsCount+7;
+						var item7:Object = new Object();
+						item7.count = 7;
+						SBmodel.runsCountAC.addItem(item7);					
+						break;
+					case "wicketButton":						
+						var item8:Object = new Object();
+						item8.count = "W";
+						SBmodel.runsCountAC.addItem(item8);
+						SBmodel.ballsCountAC.addItem(item8);							
+						SBmodel.wicketsCount = SBmodel.wicketsCount+1;						
+						for(var o:int=0; o<SBmodel.teamB_AC.length; o++)
+						{					
+							if(SBmodel.teamB_AC[o].name == SBmodel.currentBowler) 
+							{
+								SBmodel.teamB_AC[o].wickets = int(SBmodel.teamB_AC[o].wickets)+1;							
+							}							
+						}
+						for(var f:int=0; f<SBmodel.teamA_AC.length; f++)
+						{
+							if(SBmodel.teamA_AC[f].name == SBmodel.currentBatsman) 
+							{
+								SBmodel.teamA_AC[f].active = 0;
+								SBmodel.teamA_AC[f].color = 0xFF0000;
+								SBmodel.currentBatsman = '';	
+								SBmodel.playerListState = 'closed';
+								navigator.popToFirstView();
+							}
+						}
+						SBmodel.teamA_AC.refresh();
+						break;					
+				}				
+				
+				
+				SBmodel.ballsCount = SBmodel.ballsCount+.1;
+				var item0:Object = new Object();
+				item0.count = 1;
+				SBmodel.ballsCountAC.addItem(item0);	
+				
+				
+				var j:int;
+				for(var i:int=0; i<SBmodel.ballsCountAC.length; i++)
+				{					
+					if(SBmodel.ballsCountAC[i].count == 1) 
+					{
+						j++;
+					}				
+				}
+				
+				if(j >=6)
+				{
+					j=0;
+					
+					SBmodel.oversCount++;
+					
+					for(var y:int=0; y<SBmodel.teamB_AC.length; y++)
+					{					
+						if(SBmodel.teamB_AC[y].name == SBmodel.currentBowler) 
+						{
+							SBmodel.teamB_AC[y].overs = int(SBmodel.teamB_AC[y].overs) + 1 ; 
+						}
+					}		
+					
+					SBmodel.ballsCount = SBmodel.oversCount;
+					
+					SBmodel.ballsCountAC.removeAll();
+					
+					runsButtonGroup.enabled = false;
+					ballsGroup.enabled = false;
+				}
+				
+				
+				
+				for(var k:int=0; k<SBmodel.teamA_AC.length; k++)
+				{					
+					if(SBmodel.teamA_AC[k].name == SBmodel.currentBatsman) 
+					{
+						SBmodel.teamA_AC[k].runs = int(SBmodel.teamA_AC[k].runs) + int(event.currentTarget.label); 
+						SBmodel.teamA_AC[k].ballsPlayed = (int(SBmodel.teamA_AC[k].ballsPlayed))+1; 
+						SBmodel.currentBatsmanScore = SBmodel.teamA_AC[k].runs; 						
+					}
+				}		
+				
+				
+				 for(var n:int=0; n<SBmodel.teamA_AC.length; n++)
+				{						
+					if(SBmodel.teamA_AC[n].name == SBmodel.runnerBatsman) 
+					{
+						SBmodel.runnerBatsmanScore = SBmodel.teamA_AC[n].runs;
+					} 					
+				}	 
+
+				for(var y:int=0; y<SBmodel.teamB_AC.length; y++)
+				{					
+					if(SBmodel.teamB_AC[y].name == SBmodel.currentBowler) 
+					{
+						SBmodel.teamB_AC[y].runsGiven = int(SBmodel.teamB_AC[y].runsGiven) + int(event.currentTarget.label); 
+					}
+				}		
+				
+				/* for(var o:int=0; o<SBmodel.teamB_AC.length; o++)
+				{					
+
+					if(SBmodel.teamB_AC[o].name == SBmodel.currentBowler) 
+					{
+ 
+						 var obj:Object = new Object();
+						obj.history = int(event.currentTarget.label)
+						//SBmodel.bowlerHistory[k] = SBmodel.previousBallScore+','+int(event.currentTarget.label);
+						SBmodel.bowlerHistory[o] = SBmodel.bowlerHistory.push(obj);
+
+						SBmodel.teamB_AC[o].history = SBmodel.bowlerHistory[o].history; 
+					} 					
+				}	*/
+				//SBmodel.teamB_AC.refresh();
+				
+				if(SBmodel.oversCount >= SBmodel.totalOversCount)
+				{
+					if(SBmodel.teamShuffledFlag <1)
+					{
+						var arrC:ArrayCollection;
+						arrC  = SBmodel.teamA_AC;
+						SBmodel.firstInningsBatting = SBmodel.teamA_AC;
+						SBmodel.firstInningsBowling = SBmodel.teamB_AC;
+						SBmodel.teamA_AC = SBmodel.teamB_AC;
+						SBmodel.teamB_AC = arrC;	
+					}
+					if(SBmodel.teamShuffledFlag >=1)
+					{						
+						SBmodel.secondInningsBatting = SBmodel.teamA_AC;
+						SBmodel.secondInningsBowling = SBmodel.teamB_AC;
+						alertClass.alertMessage = "Match Over";
+					}
+					else
+					{
+						navigator.popToFirstView();
+						SBmodel.playerListState = 'closed';
+					}
+					
+					
+					
+					if(SBmodel.teamShuffledFlag == 0)
+					{
+						SBmodel.targetCount = SBmodel.runsCount;	
+						SBmodel.currentBatsman = new String();
+						SBmodel.runnerBatsman = new String();
+						SBmodel.currentBowler = new String();
+						SBmodel.oversCount = new Number();
+						SBmodel.ballsCount = new Number();
+						SBmodel.runsCount = new int();
+						SBmodel.wicketsCount = new int();
+						SBmodel.currentBatsmanScore = new int();
+						SBmodel.runnerBatsmanScore = new int();
+						SBmodel.runnerBatsmanScore = new int();						
+						SBmodel.ballsCountAC.removeAll();
+						SBmodel.ballsCountAC.refresh();		
+						SBmodel.runsCountAC.removeAll();
+						SBmodel.runsCountAC.refresh();	
+					}					
+					SBmodel.teamShuffledFlag++;					
+				}
+				
+				
+				switch(event.currentTarget.id)
+				{
+					case "oneRunsButton":					
+						var currentBM:String;							
+						currentBM = SBmodel.currentBatsman;
+						SBmodel.currentBatsman = SBmodel.runnerBatsman;
+						SBmodel.runnerBatsman = currentBM;
+						break;					
+					case "threeRunsButton":										
+						var currentBM1:String;
+						currentBM1 = SBmodel.currentBatsman;
+						SBmodel.currentBatsman = SBmodel.runnerBatsman;
+						SBmodel.runnerBatsman = currentBM1;
+						break;					
+				}
+			}			
+			
+			protected function teamBBowlerDropDown_changeHandler(event:IndexChangeEvent):void
+			{
+				var previousBowler:String = new String();
+				previousBowler = SBmodel.currentBowler;
+				
+				SBmodel.currentBowler = teamBBowlerDropDown.selectedItem.name;
+				if(previousBowler != SBmodel.currentBowler)
+				{
+					runsButtonGroup.enabled = true;
+					ballsGroup.enabled = true;
+				}
+				
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<!--==========================================Step 1: Enter player names================================-->
+
+	<s:Scroller id="scroller" left="0" top="0" right="0" bottom="0"
+				minViewportInset="1" measuredSizeIncludesScrollBars="false" hasFocusableChildren="false">
+		<s:Group>
+			<s:Form width="100%">
+				<!--<s:FormItem label="Balls :" >
+				<s:HGroup id="ballsButtonGroup">
+				<s:Button label="-1" width="50" id="minusOneBall" click="Balls_clickHandler(event)"/>	
+				<s:Button label="+1" width="50" id="plusOneBall" click="Balls_clickHandler(event)"/>		
+				</s:HGroup>
+				</s:FormItem>-->
+				
+				<!--<s:FormItem>
+				<s:List itemRenderer="ballsItemrenderer" dataProvider="{ballsCountAC}" width="100%">
+				<s:layout>
+				<s:TileLayout requestedColumnCount="1"
+				requestedRowCount="1"
+				horizontalGap="0"
+				verticalGap="0"
+				orientation="columns" />
+				</s:layout>
+				</s:List>
+				</s:FormItem>-->
+				<s:FormItem>
+					<s:HGroup>
+						<s:Label text="Runs:   {SBmodel.runsCount}/{SBmodel.wicketsCount}" id="runsCountLabel"/>
+						<s:Label text="Overs : {SBmodel.ballsCount.toFixed(1)}" id="ballsCountLabel"/>
+						<s:Label text="Extras:   {SBmodel.extrasCount}"/>
+					</s:HGroup>
+					<s:Label text="Target:   {SBmodel.targetCount}" id="targetCountLabel" visible="{SBmodel.targetCount?true:false}"/>
+					<s:HGroup>
+						<s:Label id="bowlerLabel" text="Bowler: {teamBBowlerDropDown.selectedItem.name}"/>	
+						<s:Label id="currentBatsmanLabel" text="Current Batsman: {SBmodel.currentBatsman} --- {SBmodel.currentBatsmanScore}"/>						
+						<s:Label id="runnerLabel" text="Runner: {SBmodel.runnerBatsman} --- {SBmodel.runnerBatsmanScore}"/>		
+					</s:HGroup>					
+					<!--<s:List dataProvider="{SBmodel.teamB_AC}" labelField="history" width="50%" allowMultipleSelection="true"/>-->					
+				</s:FormItem>
+				<s:FormItem width="100%" >
+					<s:VGroup id="runsButtonGroup" width="100%"
+							  enabled="{!(SBmodel.currentBatsman &amp;&amp; SBmodel.runnerBatsman &amp;&amp; SBmodel.currentBowler)?false:true}">
+						<s:HGroup>
+							<s:Button label="0" width="100" height="130" id="zeroRunsButton" click="runsButton_clickHandler(event)"/>
+							<s:Button label="1" width="100" height="130" id="oneRunsButton" click="runsButton_clickHandler(event)"/>
+							<s:Button label="2" width="100" height="130" id="twoRunsButton" click="runsButton_clickHandler(event)"/>	
+							<s:Button label="3" width="100" height="130"  id="threeRunsButton" click="runsButton_clickHandler(event)"/>
+						</s:HGroup>
+						<s:HGroup>							
+							<s:Button label="4" width="100" height="130" id="fourRunsButton" click="runsButton_clickHandler(event)"/>
+							<s:Button label="5" width="100" height="130" id="fiveRunsButton" click="runsButton_clickHandler(event)"/>	
+							<s:Button label="6" width="100" height="130" id="sixRunsButton" click="runsButton_clickHandler(event)"/>
+							<s:Button label="7" width="100" height="130" id="sevenRunsButton" click="runsButton_clickHandler(event)"/>	
+						</s:HGroup>
+					</s:VGroup>
+					<s:HGroup enabled="{!(SBmodel.currentBowler)?false:true}" id="ballsGroup">
+						<s:Button label="NB" id="noBall" width="100" height="100"  click="Balls_clickHandler(event)"/>
+						<s:Button label="-1Run"  id="minusRunsButton" width="100" height="100"  click="Balls_clickHandler(event)"/>
+						<s:Button label="-1Ball" id="minusOneBall" width="100" height="100" click="Balls_clickHandler(event)"/>	
+						<s:Button label="Wicket" id="wicketButton" width="100" height="100" click="runsButton_clickHandler(event)"/>	
+					</s:HGroup>
+				</s:FormItem>				
+				<s:FormItem>
+					<s:List itemRenderer="views.ballsItemrenderer" dataProvider="{SBmodel.runsCountAC}" width="100%">
+						<s:layout>
+							<s:TileLayout requestedColumnCount="1"
+										  requestedRowCount="1"
+										  horizontalGap="0"
+										  verticalGap="0"
+										  orientation="columns" />
+						</s:layout>
+					</s:List>
+				</s:FormItem>			
+				<s:FormItem>
+					<s:SpinnerListContainer width="100%" visible="{SBmodel.teamB_AC.length!=0?true:false}" includeInLayout="{SBmodel.teamB_AC.length!=0?true:false}">
+						<s:SpinnerList width="100%" id="teamBBowlerDropDown" labelField="name" dataProvider="{SBmodel.teamB_AC}" change="teamBBowlerDropDown_changeHandler(event)">
+						</s:SpinnerList>
+					</s:SpinnerListContainer> 
+				</s:FormItem>
+			</s:Form>
+		</s:Group>
+	</s:Scroller>
+</s:View>
