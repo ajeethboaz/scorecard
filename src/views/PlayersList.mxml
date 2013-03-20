@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		xmlns:mx="library://ns.adobe.com/flex/mx" 
+		xmlns:spicefactory="http://www.spicefactory.org/parsley" 
+		xmlns:views="views.*" currentState="{SBmodel.playerListState}">
+	
+	<fx:Declarations>
+		<spicefactory:Configure/>
+	</fx:Declarations>
+	
+	<s:titleContent>
+		<views:AlertClass id="alertClass"/>
+		<s:Label text="Runs:{SBmodel.runsCount}/{SBmodel.wicketsCount} Overs:{SBmodel.ballsCount.toFixed(1)}" color="#ffffff"/>
+	</s:titleContent>
+	
+	<s:states>
+		<s:State name="open"/>
+		<s:State name="closed"/>
+	</s:states>
+	
+	<fx:Script>
+		<![CDATA[
+			import Model.ScoreBoardModel;
+			
+			import mx.collections.ArrayCollection;
+			import mx.core.IVisualElement;
+			import mx.events.FlexEvent;
+			
+			import spark.events.IndexChangeEvent;
+			import spark.events.TextOperationEvent;
+			
+			[Inject][Bindable] public var SBmodel:ScoreBoardModel;
+			
+			protected function teamA_changeHandler(event:MouseEvent):void
+			{
+				//navigator.pushView(views.BattingSelection);
+				SBmodel.teamA_AC.addItem({name:teamA_player1.text, runs:0, history:0, wickets:0, runsGiven:0, active:1, color:0x000000, ballsPlayed:0, overs:0});
+				SBmodel.teamA_AC.addItem({name:teamA_player2.text, runs:0, history:0, wickets:0, runsGiven:0, active:1, color:0x000000, ballsPlayed:0, overs:0});
+				SBmodel.teamA_AC.addItem({name:teamA_player3.text, runs:0, history:0, wickets:0, runsGiven:0, active:1, color:0x000000, ballsPlayed:0, overs:0});
+				SBmodel.teamA_AC.addItem({name:teamA_player4.text, runs:0, history:0, wickets:0, runsGiven:0, active:1, color:0x000000, ballsPlayed:0, overs:0});
+				SBmodel.teamA_AC.addItem({name:teamA_player5.text, runs:0, history:0, wickets:0, runsGiven:0, active:1, color:0x000000, ballsPlayed:0, overs:0});
+				SBmodel.teamA_AC.addItem({name:teamA_player6.text, runs:0, history:0, wickets:0, runsGiven:0, active:1, color:0x000000, ballsPlayed:0, overs:0});
+				SBmodel.teamA_AC.addItem({name:teamA_player7.text, runs:0, history:0, wickets:0, runsGiven:0, active:1, color:0x000000, ballsPlayed:0, overs:0});
+
+				
+				SBmodel.teamB_AC.addItem({name:teamB_player1.text, runs:0, history:0, wickets:0, runsGiven:0, active:1, color:0x000000, ballsPlayed:0, overs:0});
+				SBmodel.teamB_AC.addItem({name:teamB_player2.text, runs:0, history:0, wickets:0, runsGiven:0, active:1, color:0x000000, ballsPlayed:0, overs:0});
+				SBmodel.teamB_AC.addItem({name:teamB_player3.text, runs:0, history:0, wickets:0, runsGiven:0, active:1, color:0x000000, ballsPlayed:0, overs:0});
+				SBmodel.teamB_AC.addItem({name:teamB_player4.text, runs:0, history:0, wickets:0, runsGiven:0, active:1, color:0x000000, ballsPlayed:0, overs:0});
+				SBmodel.teamB_AC.addItem({name:teamB_player5.text, runs:0, history:0, wickets:0, runsGiven:0, active:1, color:0x000000, ballsPlayed:0, overs:0});
+				SBmodel.teamB_AC.addItem({name:teamB_player6.text, runs:0, history:0, wickets:0, runsGiven:0, active:1, color:0x000000, ballsPlayed:0, overs:0});
+				SBmodel.teamB_AC.addItem({name:teamB_player7.text, runs:0, history:0, wickets:0, runsGiven:0, active:1, color:0x000000, ballsPlayed:0, overs:0});
+
+				playersSubmit.enabled = false;
+				
+				this.currentState = 'closed';
+				
+				/* for(var i:int = 0; i<Agroup.numElements; i++)
+				{					
+					var currentGroup:Object = Agroup.getElementAt(i);
+				
+					for(var j:int = 0; j < currentGroup.numElements; j++)
+					{
+						SBmodel.teamA_AC.addItem({name:currentGroup.getElementAt(j).text, runs:0, history:0, wickets:0, runsGiven:0, active:1, color:0x000000});
+					}						
+				} */
+			}			
+			
+			protected function list1_clickHandler(event:MouseEvent):void
+			{
+				/* var currentDataItem:Object = event.currentTarget.selectedItem;
+				SBmodel.currentBatsman = event.currentTarget.selectedItem.name.toString();
+				SBmodel.runnerBatsman = currentDataItem.name; */
+			}
+			
+			protected function resetButton_clickHandler(event:MouseEvent):void
+			{
+				playersSubmit.enabled = true;
+				SBmodel.currentBatsman = new String();
+				SBmodel.runnerBatsman = new String();
+				SBmodel.currentBowler = new String();
+				SBmodel.oversCount = new Number();
+				SBmodel.ballsCount = new Number();
+				SBmodel.runsCount = new int();
+				SBmodel.wicketsCount = new int();
+				SBmodel.currentBatsmanScore = new int();
+				SBmodel.runnerBatsmanScore = new int();
+				SBmodel.runnerBatsmanScore = new int();
+				SBmodel.totalOversCount = new int();
+				SBmodel.targetCount = new int();
+				SBmodel.teamA_AC.removeAll();
+				SBmodel.teamA_AC.refresh();				
+				SBmodel.teamB_AC.removeAll();
+				SBmodel.teamB_AC.refresh();
+				SBmodel.ballsCountAC.removeAll();
+				SBmodel.ballsCountAC.refresh();		
+				SBmodel.runsCountAC.removeAll();
+				SBmodel.runsCountAC.refresh();
+				SBmodel.firstInningsBatting.removeAll();
+				SBmodel.firstInningsBatting.refresh();	
+				SBmodel.firstInningsBowling.removeAll();
+				SBmodel.firstInningsBowling.refresh();	
+				SBmodel.secondInningsBatting.removeAll();
+				SBmodel.secondInningsBatting.refresh();	
+				SBmodel.secondInningsBowling.removeAll();
+				SBmodel.secondInningsBowling.refresh();	
+				
+				for(var f:int=0; f<SBmodel.teamA_AC.length; f++)
+				{
+					SBmodel.teamA_AC[f].color = 0x000000;
+				}
+			}
+			
+			protected function oversCount_changeHandler(event:TextOperationEvent):void
+			{
+				SBmodel.totalOversCount = int(oversCnt.text);
+			}
+			
+			protected function teamACurrentBatDropDown_changeHandler(event:IndexChangeEvent):void
+			{
+				if(teamACurrentBatDropDown.selectedItem.active == 0)
+				{
+					alertClass.alertMessage = "Please select another Batsman";
+					return;
+				}
+				
+				SBmodel.currentBatsman = teamACurrentBatDropDown.selectedItem.name;	
+
+				if(SBmodel.currentBatsman == SBmodel.runnerBatsman)
+				{
+					alertClass.alertMessage = "Current Batsman and Runner cannot be the same";
+					return;
+				}				
+				
+				if(SBmodel.currentBatsman && SBmodel.runnerBatsman)
+				{
+					navigator.pushView(views.ScoreBoardCalculation);
+				}
+			}
+			
+			protected function teamARunnerDropDown_changeHandler(event:IndexChangeEvent):void
+			{
+				if(teamARunnerDropDown.selectedItem.active == 0)
+				{
+					alertClass.alertMessage = "Please select another Batsman";
+					return;
+				}
+				
+				SBmodel.runnerBatsman = teamARunnerDropDown.selectedItem.name;
+				
+				if(SBmodel.currentBatsman == SBmodel.runnerBatsman)
+				{
+					alertClass.alertMessage = "Current Batsman and Runner cannot be the same";
+					return;
+				}
+				
+				
+				if(SBmodel.currentBatsman && SBmodel.runnerBatsman)
+				{
+					navigator.pushView(views.ScoreBoardCalculation);
+				}		
+			}
+			
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				if (this.currentState == 'closed')
+				{
+					this.currentState = 'open';	
+				}else
+				{
+					this.currentState = 'closed';
+				}	
+			}
+			public var textInp:TextInput = new TextInput();
+			protected function addAplayer_clickHandler(event:MouseEvent):void
+			{
+				if(textInp.text)
+				{
+					SBmodel.teamA_AC.addItem({name:textInp.text, runs:0, history:0, wickets:0, runsGiven:0, active:1, color:0x000000});	
+				}				
+				textInp = new TextInput();
+				textInp.width = 200;
+				if(Agroup.numElements -1 != 11)
+				{
+					Agroup.addElement(textInp);	
+				}				
+				textInp.addEventListener(FlexEvent.ENTER, newPlayer);
+				
+			}
+			
+			protected function removeAplayer_clickHandler(event:MouseEvent):void
+			{
+				Agroup.removeElementAt(Agroup.numElements -1);
+				SBmodel.teamA_AC.removeItemAt(SBmodel.teamA_AC.length - 1);
+			}
+
+			public function newPlayer(me:FlexEvent):void
+			{
+				if(textInp.text)
+				{
+					SBmodel.teamA_AC.addItem({name:textInp.text, runs:0, history:0, wickets:0, runsGiven:0, active:1, color:0x000000});		
+				}			
+			}
+		]]>
+	</fx:Script>
+
+	
+	<s:Scroller id="scroller" left="0" top="0" right="0" bottom="0"
+				minViewportInset="1" measuredSizeIncludesScrollBars="false" hasFocusableChildren="false">
+		<s:Group>
+			<s:layout>
+				<s:VerticalLayout paddingTop="20"/>
+			</s:layout>
+<!--==========================================Step 1: Enter player names================================-->
+			
+			<s:Button label="Edit player details +" click="button1_clickHandler(event)" includeIn="closed"/>
+			<s:VGroup width="100%" id="group" horizontalAlign="center" includeIn="open">
+				<s:HGroup>	
+					<s:VGroup>
+						<s:VGroup id="Agroup">
+							<s:Label text="Team A"/>
+							<s:TextInput width="200" id="teamA_player1" text="1"/>
+							<s:TextInput width="200" id="teamA_player2" text="2"/>
+							<s:TextInput width="200" id="teamA_player3" text="3"/>
+							<s:TextInput width="200" id="teamA_player4" text="4"/>
+							<s:TextInput width="200" id="teamA_player5" text="5"/>
+							<s:TextInput width="200" id="teamA_player6" text="6"/>
+							<s:TextInput width="200" id="teamA_player7" text="7"/>
+						</s:VGroup>
+						
+						<s:HGroup>
+							<s:Button label="+" id="addAplayer" click="addAplayer_clickHandler(event)"/>
+							<s:Button label="-" id="removeAplayer" click="removeAplayer_clickHandler(event)"/>	
+						</s:HGroup>							
+					</s:VGroup>
+					<s:VGroup>
+						<s:Label text="Team B"/>
+						<s:TextInput width="200" id="teamB_player1" text="6"/>
+						<s:TextInput width="200" id="teamB_player2" text="7"/>
+						<s:TextInput width="200" id="teamB_player3" text="8"/>
+						<s:TextInput width="200" id="teamB_player4" text="9"/>
+						<s:TextInput width="200" id="teamB_player5" text="10"/>
+						<s:TextInput width="200" id="teamB_player6" text="11"/>
+						<s:TextInput width="200" id="teamB_player7" text="12"/>
+					</s:VGroup>				
+				</s:HGroup>				
+				<s:HGroup>
+					<s:Label text="Total Overs:"/>
+					<s:TextInput width="200" id="oversCnt" change="oversCount_changeHandler(event)" />	
+				</s:HGroup>	
+				<s:HGroup>
+					<s:Button id="playersSubmit" label="Submit" click="teamA_changeHandler(event)" horizontalCenter="0" verticalCenter="0" enabled="{!SBmodel.totalOversCount?false:true}"/>
+					<s:Button id="resetButton" label="Reset" click="resetButton_clickHandler(event)" horizontalCenter="0" verticalCenter="0"/>	
+					<s:Button label="Minimize -" click="button1_clickHandler(event)" includeIn="open"/>	
+				</s:HGroup>		
+			</s:VGroup>
+		
+		<!--==========================================Step 2: Select batsman====================================-->
+		
+			<!--<views:AlertClass id="alertClass"/>-->
+			<s:HGroup width="100%" top="30">
+				<s:VGroup width="100%" visible="{SBmodel.teamA_AC.length!=0?true:false}" includeInLayout="{SBmodel.teamA_AC.length!=0?true:false}">
+					<s:Label id="currentBatsmanLabel" text="Current Batsman: {SBmodel.currentBatsman} --- {SBmodel.currentBatsmanScore}"/>						
+					<s:SpinnerListContainer width="100%">
+						<s:SpinnerList width="100%" id="teamACurrentBatDropDown" labelField="name" dataProvider="{SBmodel.teamA_AC}" 
+									   change="teamACurrentBatDropDown_changeHandler(event)" name="{SBmodel.currentBatsman}">
+						</s:SpinnerList>
+					</s:SpinnerListContainer> 
+				</s:VGroup>
+				<s:VGroup width="100%" visible="{SBmodel.teamB_AC.length!=0?true:false}" includeInLayout="{SBmodel.teamB_AC.length!=0?true:false}">
+					<s:Label id="runnerLabel" text="Runner: {SBmodel.runnerBatsman} --- {SBmodel.runnerBatsmanScore}"/>	
+					<s:SpinnerListContainer width="100%">
+						<s:SpinnerList width="100%" id="teamARunnerDropDown" labelField="name" dataProvider="{SBmodel.teamA_AC}" 
+									   change="teamARunnerDropDown_changeHandler(event)">
+						</s:SpinnerList>
+					</s:SpinnerListContainer> 
+				</s:VGroup>					
+			</s:HGroup>
+		
+			
+		<!--==========================================Match Summary==============================================-->
+		
+			<s:VGroup width="100%">
+				<!--(data.active==1?Normal_COLOR:Out_COLOR)(data.name==outerDocument.SBmodel.currentBatsman ?Current_COLOR:Normal_COLOR)-->
+				<!--<s:DataGrid id="teamAList" dataProvider="{SBmodel.teamA_AC}" height="100%" width="100%" visible="{SBmodel.teamA_AC.length!=0?true:false}" includeInLayout="{SBmodel.teamA_AC.length!=0?true:false}"> 
+					<s:columns>
+						<s:ArrayList>
+							<s:GridColumn dataField="name" headerText="Name" >
+								<s:itemRenderer>
+									<fx:Component>
+										<s:GridItemRenderer top="5" left="5" >																			
+											<s:Label text="{data.name}" top="5" left="5" 
+													 color="{(data.color)}" />
+										</s:GridItemRenderer>
+									</fx:Component>
+								</s:itemRenderer>
+							</s:GridColumn>
+							<s:GridColumn dataField="runs" headerText="Runs">
+								<s:itemRenderer>
+									<fx:Component>
+										<s:GridItemRenderer top="5" left="5" >											
+											<s:Label text="{data.runs}/{data.ballsPlayed}" top="5" left="5" 
+													 color="{(data.color)}" />
+										</s:GridItemRenderer>
+									</fx:Component>
+								</s:itemRenderer>
+							</s:GridColumn>
+							<s:GridColumn dataField="wickets" headerText="Wickets"/>
+							<s:GridColumn dataField="runsGiven" headerText="RunsGiven"/>
+						</s:ArrayList>
+					</s:columns>			
+				</s:DataGrid>
+				<s:DataGrid id="teamBList" dataProvider="{SBmodel.teamB_AC}" height="100%" width="100%" visible="{SBmodel.teamB_AC.length!=0?true:false}" includeInLayout="{SBmodel.teamB_AC.length!=0?true:false}"> 
+					<s:columns>
+						<s:ArrayList>
+							<s:GridColumn dataField="name" headerText="Name">
+								<s:itemRenderer>
+									<fx:Component>
+										<s:GridItemRenderer top="5" left="5" >											
+											<fx:Script>
+												<![CDATA[
+													private const Normal_COLOR:uint = 0x000000; // Black
+													private const Out_COLOR:uint = 0xFF0000; // Red
+													private const Current_COLOR:uint = 0x00FF00; // Green
+												]]>
+											</fx:Script>											
+											<s:Label text="{data.name}" top="5" left="5" 
+													 color="{(data.color)}" />
+										</s:GridItemRenderer>
+									</fx:Component>
+								</s:itemRenderer>
+							</s:GridColumn>
+							<s:GridColumn dataField="runs" headerText="Runs">
+								<s:itemRenderer>
+									<fx:Component>
+										<s:GridItemRenderer top="5" left="5" >											
+											<s:Label text="{data.runs}/{data.ballsPlayed}" top="5" left="5" 
+													 color="{(data.color)}" />
+										</s:GridItemRenderer>
+									</fx:Component>
+								</s:itemRenderer>
+							</s:GridColumn>
+							<s:GridColumn dataField="wickets" headerText="Wickets"/>
+							<s:GridColumn dataField="runsGiven" headerText="RunsGiven"/>
+						</s:ArrayList>
+					</s:columns>			
+				</s:DataGrid>-->
+				<!--<s:List id="teamAList" dataProvider="{SBmodel.teamA_AC}" itemRenderer="views.playerListItemRenderer" width="50%" allowMultipleSelection="true" />-->
+				<!--<s:List dataProvider="{SBmodel.teamB_AC}" itemRenderer="views.playerListItemRenderer" width="50%" allowMultipleSelection="true"/>-->
+
+<!--==========================================Match Summary 1st Innings==============================================-->
+
+				<s:Label text="1st Innings" visible="{SBmodel.firstInningsBatting.length!=0?true:false}" includeInLayout="{SBmodel.firstInningsBatting.length!=0?true:false}"/>
+				<s:DataGrid dataProvider="{SBmodel.firstInningsBatting}" height="100%" width="100%" visible="{SBmodel.firstInningsBatting.length!=0?true:false}" includeInLayout="{SBmodel.firstInningsBatting.length!=0?true:false}"> 
+					<s:columns>
+						<s:ArrayList>
+							<s:GridColumn dataField="name" headerText="Name" />
+							<s:GridColumn dataField="runs" headerText="Runs">
+								<s:itemRenderer>
+									<fx:Component>
+										<s:GridItemRenderer top="5" left="5" >											
+											<s:Label text="{data.runs}/{data.ballsPlayed}" top="5" left="5" 
+													 color="{(data.color)}" />
+										</s:GridItemRenderer>
+									</fx:Component>
+								</s:itemRenderer>
+							</s:GridColumn>
+							<s:GridColumn headerText="S/R">
+								<s:itemRenderer>
+									<fx:Component>
+										<s:GridItemRenderer top="5" left="5" >											
+											<s:Label text="{((int(data.runs)/int(data.ballsPlayed))*100).toFixed(0)}" top="5" left="5" id="sr"/>
+										</s:GridItemRenderer>
+									</fx:Component>
+								</s:itemRenderer>
+							</s:GridColumn>
+						</s:ArrayList>
+					</s:columns>			
+				</s:DataGrid>
+				<s:DataGrid dataProvider="{SBmodel.firstInningsBowling}" height="100%" width="100%" visible="{SBmodel.firstInningsBowling.length!=0?true:false}" includeInLayout="{SBmodel.firstInningsBowling.length!=0?true:false}"> 
+					<s:columns>
+						<s:ArrayList>
+							<s:GridColumn dataField="name" headerText="Name" />
+							<s:GridColumn dataField="overs" headerText="Overs"/>
+							<s:GridColumn dataField="runsGiven" headerText="Runs"/>
+							<s:GridColumn dataField="wickets" headerText="Wickets"/>
+							<s:GridColumn headerText="R/R">
+								<s:itemRenderer>
+									<fx:Component>
+										<s:GridItemRenderer top="5" left="5" >											
+											<s:Label text="{(int(data.runsGiven)/int(data.overs)).toFixed(0)}" top="5" left="5"/>
+										</s:GridItemRenderer>
+									</fx:Component>
+								</s:itemRenderer>
+							</s:GridColumn>
+						</s:ArrayList>
+					</s:columns>			
+				</s:DataGrid>
+				
+<!--==========================================Match Summary 2nd Innings==============================================-->
+				
+				<s:Label text="2nd Innings" visible="{SBmodel.secondInningsBatting.length!=0?true:false}" includeInLayout="{SBmodel.secondInningsBatting.length!=0?true:false}"/>
+				<s:DataGrid dataProvider="{SBmodel.secondInningsBatting}" height="100%" width="100%" visible="{SBmodel.secondInningsBatting.length!=0?true:false}" includeInLayout="{SBmodel.secondInningsBatting.length!=0?true:false}"> 
+					<s:columns>
+						<s:ArrayList>
+							<s:GridColumn dataField="name" headerText="Name" />
+							<s:GridColumn dataField="runs" headerText="Runs">
+								<s:itemRenderer>
+									<fx:Component>
+										<s:GridItemRenderer top="5" left="5" >											
+											<s:Label text="{data.runs}/{data.ballsPlayed}" top="5" left="5" 
+													 color="{(data.color)}" />
+										</s:GridItemRenderer>
+									</fx:Component>
+								</s:itemRenderer>
+							</s:GridColumn>
+							<s:GridColumn headerText="S/R">
+								<s:itemRenderer>
+									<fx:Component>
+										<s:GridItemRenderer top="5" left="5" >											
+											<s:Label text="{((int(data.runs)/int(data.ballsPlayed))*100).toFixed(0)}" top="5" left="5"/>
+										</s:GridItemRenderer>
+									</fx:Component>
+								</s:itemRenderer>
+							</s:GridColumn>
+						</s:ArrayList>
+					</s:columns>			
+				</s:DataGrid>
+				<s:DataGrid dataProvider="{SBmodel.secondInningsBowling}" height="100%" width="100%" visible="{SBmodel.secondInningsBowling.length!=0?true:false}" includeInLayout="{SBmodel.secondInningsBowling.length!=0?true:false}"> 
+					<s:columns>
+						<s:ArrayList>
+							<s:GridColumn dataField="name" headerText="Name" />
+							<s:GridColumn dataField="overs" headerText="Overs"/>
+							<s:GridColumn dataField="runsGiven" headerText="Runs"/>
+							<s:GridColumn dataField="wickets" headerText="Wickets"/>
+							<s:GridColumn headerText="R/R">
+								<s:itemRenderer>
+									<fx:Component>
+										<s:GridItemRenderer top="5" left="5" >											
+											<s:Label text="{(int(data.runsGiven)/int(data.overs)).toFixed(0)}" top="5" left="5"/>
+										</s:GridItemRenderer>
+									</fx:Component>
+								</s:itemRenderer>
+							</s:GridColumn>
+						</s:ArrayList>
+					</s:columns>			
+				</s:DataGrid>
+			</s:VGroup>
+		</s:Group>
+	</s:Scroller>
+</s:View>
